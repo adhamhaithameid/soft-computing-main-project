@@ -2,6 +2,10 @@
 
 This file is the complete guide for the project.
 
+## Repository
+- GitHub: https://github.com/adhamhaithameid/soft-computing-main-project
+- Direct Colab notebook: https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
+
 ## 1) Project Goal
 Build a full Soft Computing course project using one dataset, including:
 - preprocessing

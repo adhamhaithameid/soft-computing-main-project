@@ -12,6 +12,8 @@
 - Lecture understanding summary added (`07_docs/11_lecture_understanding.md`).
 - Single-command runner created (`run_all.sh`).
 - Full local experiment run completed and outputs generated.
+- GitHub repository created and pushed:
+  - `https://github.com/adhamhaithameid/soft-computing-main-project`
 
 ## Data Snapshot
 - Local CSV is now the full cleaned dataset with `11,500` rows and `180` columns (including target).

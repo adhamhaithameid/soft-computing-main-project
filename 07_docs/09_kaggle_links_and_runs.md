@@ -20,3 +20,6 @@ Run log entries should be appended here with:
   - Binary best: `SVM + SVD`, accuracy `0.9719`, AUC `0.9945`.
   - Multiclass best: `MLP_ANN + Original`, accuracy `0.6747`.
   - Updated paper draft sections generated in `06_paper/draft/`.
+- 2026-04-07: Repository published on GitHub.
+  - Repo: `https://github.com/adhamhaithameid/soft-computing-main-project`
+  - Colab direct notebook URL configured and documented.

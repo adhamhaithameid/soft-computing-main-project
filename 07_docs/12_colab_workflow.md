@@ -4,11 +4,12 @@ This is the main cloud execution path for the project.
 
 ## Notebook
 - Colab notebook path: `03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
+- Direct URL: https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
 
 ## How to run in Colab
 1. Open Google Colab.
-2. Upload this project folder to `/content/` (or mount Google Drive and place it there).
-3. Open and run:
+2. Open the direct URL above (recommended).
+3. If needed, open and run:
    - `03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
 4. Execute cells in order.
 

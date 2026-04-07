@@ -4,6 +4,7 @@ This repository contains the full course project pipeline for the **Epileptic Se
 
 ## Colab (Recommended)
 
+- Open directly in Colab: [epileptic_seizure_full_pipeline_colab.ipynb](https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb)
 - Notebook: `03_notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
 - Run this notebook in Google Colab to execute:
   - data fetching
@@ -53,3 +54,9 @@ python 04_src/fetch_data.py --force-download
 - `05_results/`: metrics tables, fold outputs, and figures.
 - `06_paper/`: template, draft sections, paper tables and figures.
 - `07_docs/`: planning, method notes, and execution log.
+
+## Top-Level Guides
+
+- `PROJECT_MASTER_GUIDE.md`: full project explanation and progress.
+- `FOLDER_STRUCTURE.md`: clean tree of folders/files.
+- `ABOUT.md`: repository scope summary.

@@ -15,13 +15,14 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.core import CartesianSpec, RunnerIO  # noqa: E402
+from src.core import CartesianSpec, RunnerIO, build_summary, save_comparisons  # noqa: E402
 from src.core.benchmark import run_cartesian_benchmark  # noqa: E402
 from src.config.paths import (  # noqa: E402
     DATA_PROCESSED_DIR,
     DATASET_CSV,
     RESULTS_FIGURES_DIR,
     RESULTS_METRICS_DIR,
+    RESULTS_REPORTS_DIR,
     RESULTS_TABLES_DIR,
 )
 
@@ -135,20 +136,9 @@ def main() -> None:
     )
 
     ok = df[df["status"] == "ok"].copy()
-    summary = (
-        ok.groupby(["track", "preprocessing", "reduction", "selection", "model"], as_index=False)
-        .agg(
-            accuracy=("accuracy", "mean"),
-            precision=("precision", "mean"),
-            recall=("recall", "mean"),
-            f1=("f1", "mean"),
-            roc_auc=("roc_auc", "mean"),
-            fit_time_sec=("fit_time_sec", "mean"),
-            predict_time_sec=("predict_time_sec", "mean"),
-        )
-        .sort_values(["track", "accuracy"], ascending=[True, False])
-    )
+    summary = build_summary(ok).sort_values(["track", "accuracy"], ascending=[True, False])
     summary.to_csv(RESULTS_TABLES_DIR / "cartesian_summary_by_combo.csv", index=False)
+    saved = save_comparisons(summary, RESULTS_TABLES_DIR, RESULTS_REPORTS_DIR)
 
     print("Cartesian benchmark completed.")
     print(f"Expected combos: {spec.expected_combos}")
@@ -156,6 +146,9 @@ def main() -> None:
     print(f"Saved metrics: {metrics_csv}")
     print(f"Saved manifest: {manifest_json}")
     print(f"Saved summary: {RESULTS_TABLES_DIR / 'cartesian_summary_by_combo.csv'}")
+    print(f"Saved binary rankings: {saved['binary']}")
+    print(f"Saved multiclass rankings: {saved['multiclass']}")
+    print(f"Saved comparison report: {saved['report']}")
 
 
 if __name__ == "__main__":

@@ -12,8 +12,8 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-RAW_DIR = ROOT / "02_data" / "raw" / "epileptic_seizure_recognition"
+ROOT = Path(__file__).resolve().parents[2]
+RAW_DIR = ROOT / "data" / "raw" / "epileptic_seizure_recognition"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 RAW_CSV = RAW_DIR / "epileptic_seizure_data.csv"

@@ -3,13 +3,13 @@
   "columns": 180,
   "target_column": "y",
   "dropped_bad_rows": 0,
-  "path": "/Users/adhamhaithameid/Desktop/soft computing - research/02_data/raw/epileptic_seizure_recognition/epileptic_seizure_data.csv",
+  "path": "/Users/adhamhaithameid/Desktop/soft computing - research/data/raw/epileptic_seizure_recognition/epileptic_seizure_data.csv",
   "dataset": "Epileptic Seizure Recognition",
   "source": "Kaggle/UCI source",
-  "selected_source_url": "https://raw.githubusercontent.com/akshayg056/Epileptic-seizure-detection-/master/data.csv",
+  "selected_source_url": "cached_local_file",
   "source_links": [
-    "https://archive.ics.uci.edu/static/public/388/epileptic+seizure+recognition.zip",
     "https://raw.githubusercontent.com/akshayg056/Epileptic-seizure-detection-/master/data.csv",
-    "https://raw.githubusercontent.com/dragonpilee/Epileptic-Seizure-Detection-System/master/data.csv"
+    "https://raw.githubusercontent.com/dragonpilee/Epileptic-Seizure-Detection-System/master/data.csv",
+    "https://archive.ics.uci.edu/static/public/388/epileptic+seizure+recognition.zip"
   ]
 }

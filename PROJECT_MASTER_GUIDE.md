@@ -67,4 +67,5 @@ Or run the Colab notebook in `notebooks/colab/`.
 - Colab workflow: `docs/guides/colab_workflow.md`
 - Lecture understanding: `docs/guides/lecture_understanding.md`
 - Current status: `docs/status/current_status.md`
+- Migration notes: `docs/status/migration_notes.md`
 - Paper writing plan: `docs/paper/paper_writing_plan.md`

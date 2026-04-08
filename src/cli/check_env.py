@@ -7,8 +7,8 @@ import csv
 import importlib.util
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[1]
-RAW = ROOT / "02_data" / "raw" / "epileptic_seizure_recognition" / "epileptic_seizure_data.csv"
+ROOT = Path(__file__).resolve().parents[2]
+RAW = ROOT / "data" / "raw" / "epileptic_seizure_recognition" / "epileptic_seizure_data.csv"
 
 required = [
     "numpy",

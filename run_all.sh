@@ -10,6 +10,7 @@ fi
 python src/cli/fetch_data.py
 python src/cli/check_env.py
 python src/cli/run_experiments.py
+python src/cli/validate_cartesian_outputs.py
 python src/cli/generate_paper_drafts.py
 
 echo "All steps completed."

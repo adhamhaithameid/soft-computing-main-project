@@ -7,9 +7,9 @@ elif [[ -f ".venv/bin/activate" ]]; then
   source .venv/bin/activate
 fi
 
-python 04_src/fetch_data.py
-python 04_src/check_env.py
-python 04_src/run_experiments.py
-python 04_src/generate_paper_drafts.py
+python src/cli/fetch_data.py
+python src/cli/check_env.py
+python src/cli/run_experiments.py
+python src/cli/generate_paper_drafts.py
 
 echo "All steps completed."

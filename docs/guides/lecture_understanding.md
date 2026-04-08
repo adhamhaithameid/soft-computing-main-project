@@ -42,7 +42,7 @@ This file summarizes what was understood from the provided lecture PDFs and how 
   - Embedded methods (e.g., L1/L2-regularized models).
 - Tradeoff: filter is fast, wrapper is computationally expensive but can perform better, embedded balances both.
 - Practical implication for this project:
-  - `filter_kbest` (ANOVA) implemented.
+  - `filter_anova` and `filter_chi2` implemented.
   - `wrapper_sfs` implemented.
   - `embedded_l1` implemented.
 

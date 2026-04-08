@@ -9,6 +9,6 @@ Classifiers:
 - MLP (ANN)
 
 Setup:
-- 5-fold stratified CV
+- 3-fold stratified CV
 - Same folds across model comparisons
 - Metrics recorded per fold and averaged

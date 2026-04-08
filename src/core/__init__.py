@@ -11,6 +11,7 @@ from .cartesian_pipeline import (
 )
 from .benchmark import run_cartesian_benchmark
 from .comparisons import build_summary, save_comparisons
+from .plots import generate_cartesian_plots
 from .runner import RunnerIO, ResumeState, append_checkpoint, load_resume_state, write_manifest
 
 __all__ = [
@@ -26,6 +27,7 @@ __all__ = [
     "run_cartesian_benchmark",
     "build_summary",
     "save_comparisons",
+    "generate_cartesian_plots",
     "RunnerIO",
     "ResumeState",
     "append_checkpoint",

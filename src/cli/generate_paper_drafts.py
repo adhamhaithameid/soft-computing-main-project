@@ -9,9 +9,9 @@ import pandas as pd
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DRAFT_DIR = ROOT / "06_paper" / "draft"
-TABLES_DIR = ROOT / "06_paper" / "tables"
-METRICS_SUMMARY = ROOT / "05_results" / "tables" / "summary_accuracy.csv"
+DRAFT_DIR = ROOT / "paper" / "draft"
+TABLES_DIR = ROOT / "paper" / "tables"
+METRICS_SUMMARY = ROOT / "results" / "tables" / "summary_accuracy.csv"
 
 DRAFT_DIR.mkdir(parents=True, exist_ok=True)
 TABLES_DIR.mkdir(parents=True, exist_ok=True)

@@ -45,14 +45,14 @@ RANDOM_STATE = 42
 CV_SPLITS = 3
 
 ROOT = Path(__file__).resolve().parents[1]
-RAW_CSV = ROOT / "02_data" / "raw" / "epileptic_seizure_recognition" / "epileptic_seizure_data.csv"
+RAW_CSV = ROOT / "data" / "raw" / "epileptic_seizure_recognition" / "epileptic_seizure_data.csv"
 
-RESULTS_TABLES = ROOT / "05_results" / "tables"
-RESULTS_METRICS = ROOT / "05_results" / "metrics"
-RESULTS_FIGURES = ROOT / "05_results" / "figures"
-RESULTS_FOLDS = ROOT / "05_results" / "folds"
-INTERIM_DIR = ROOT / "02_data" / "interim"
-PROCESSED_DIR = ROOT / "02_data" / "processed"
+RESULTS_TABLES = ROOT / "results" / "tables"
+RESULTS_METRICS = ROOT / "results" / "metrics"
+RESULTS_FIGURES = ROOT / "results" / "figures"
+RESULTS_FOLDS = ROOT / "results" / "folds"
+INTERIM_DIR = ROOT / "data" / "interim"
+PROCESSED_DIR = ROOT / "data" / "processed"
 
 for p in [RESULTS_TABLES, RESULTS_METRICS, RESULTS_FIGURES, RESULTS_FOLDS, INTERIM_DIR, PROCESSED_DIR]:
     p.mkdir(parents=True, exist_ok=True)
@@ -61,7 +61,7 @@ for p in [RESULTS_TABLES, RESULTS_METRICS, RESULTS_FIGURES, RESULTS_FOLDS, INTER
 def load_dataset() -> Tuple[pd.DataFrame, np.ndarray, np.ndarray]:
     if not RAW_CSV.exists():
         raise FileNotFoundError(
-            f"Raw CSV not found at {RAW_CSV}. Run: python 04_src/fetch_data.py"
+            f"Raw CSV not found at {RAW_CSV}. Run: python src/cli/fetch_data.py"
         )
 
     df = pd.read_csv(RAW_CSV)

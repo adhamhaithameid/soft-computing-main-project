@@ -91,6 +91,3 @@ Global run index:
 3. Inspect top tables/figures.
 4. Update paper intro/discussion wording if needed.
 5. Export selected tables/figures into your final submission package.
-
-## 11) External Best-Practice Mapping
-- See `docs/guides/similar_projects_playbook.md` for a practical map of what strong public seizure-AI projects usually implement and what to adopt next here.

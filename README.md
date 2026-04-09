@@ -125,4 +125,3 @@ Validation report:
 - `PROJECT_MASTER_GUIDE.md`
 - `FOLDER_STRUCTURE.md`
 - `ABOUT.md`
-- `docs/guides/similar_projects_playbook.md`

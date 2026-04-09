@@ -1,7 +1,7 @@
 # Folder Structure
 
 ```text
-soft-computing-main-project/
+epileptic-seizure-recognition-soft-computing/
 ├── assets/
 │   └── lectures/
 ├── data/

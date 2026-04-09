@@ -2,7 +2,7 @@
 
 ## Notebook
 - Path: `notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
-- Direct URL: https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
+- Direct URL: https://colab.research.google.com/github/adhamhaithameid/epileptic-seizure-recognition-soft-computing/blob/main/notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
 
 ## How to run
 1. Open the URL above.

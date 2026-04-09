@@ -62,12 +62,28 @@ def _check_method_coverage(df: pd.DataFrame, spec: CartesianSpec) -> List[str]:
     return errors
 
 
+def _format_hms(seconds: float | int | None) -> str:
+    if seconds is None:
+        return "N/A"
+    total = max(0, int(float(seconds)))
+    h, rem = divmod(total, 3600)
+    m, s = divmod(rem, 60)
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
 def main() -> None:
+    validation_started = datetime.now(timezone.utc)
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--allow-partial",
         action="store_true",
         help="Allow partial run counts (useful for smoke tests with --max-rows).",
+    )
+    parser.add_argument(
+        "--report-path",
+        type=Path,
+        default=RESULTS_REPORTS_DIR / "cartesian_validation_report.md",
+        help="Write markdown report to this path (default: results/reports/cartesian_validation_report.md).",
     )
     args = parser.parse_args()
 
@@ -167,6 +183,20 @@ def main() -> None:
             print(f"- NOTE: {n}")
         raise SystemExit(1)
 
+    ok_pct = (completed_ok / len(df) * 100.0) if len(df) else 0.0
+    runtime_sec = float(manifest.get("runtime_sec", 0.0))
+    skip_reasons = []
+    if "status" in df.columns and "skip_reason" in df.columns:
+        failed = df[df["status"] != "ok"].copy()
+        if not failed.empty:
+            reason_counts = (
+                failed["skip_reason"].fillna("unknown").astype(str).value_counts().head(8)
+            )
+            skip_reasons = [(str(k), int(v)) for k, v in reason_counts.items()]
+
+    validation_finished = datetime.now(timezone.utc)
+    validation_runtime_sec = (validation_finished - validation_started).total_seconds()
+
     report_lines = [
         "# Cartesian Validation Report",
         "",
@@ -176,17 +206,31 @@ def main() -> None:
         f"- Metrics rows: {len(df)}",
         f"- Completed ok: {completed_ok}",
         f"- Skipped or failed: {skipped_or_failed}",
+        f"- Completed ok (%): {ok_pct:.2f}%",
         f"- Figures found: {len(figure_paths)}",
         f"- Mode: {'partial allowed' if args.allow_partial else 'strict full run'}",
+        f"- Runtime (sec): {runtime_sec:.2f}",
+        f"- Runtime (HH:MM:SS): {_format_hms(runtime_sec)}",
+        f"- Execution device: {manifest.get('execution_device', 'unknown')}",
+        f"- Acceleration backend: {manifest.get('acceleration_backend', 'unknown')}",
+        f"- Checkpoint percent: {manifest.get('checkpoint_percent', 'unknown')}",
+        f"- Run label: {manifest.get('run_label', 'N/A') or 'N/A'}",
+        f"- Platform profile: {manifest.get('platform_profile', 'N/A') or 'N/A'}",
+        f"- Started (UTC): {manifest.get('started_utc', 'N/A')}",
+        f"- Finished (UTC): {manifest.get('finished_utc', 'N/A')}",
+        f"- Validation runtime (sec): {validation_runtime_sec:.3f}",
         "",
         "Validation result: PASS",
     ]
+    if skip_reasons:
+        report_lines.extend(["", "## Top Skip Reasons"])
+        report_lines.extend([f"- {reason}: {count}" for reason, count in skip_reasons])
     if notes:
         report_lines.extend(["", "## Notes"])
         report_lines.extend([f"- {n}" for n in notes])
 
-    RESULTS_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-    report_path = RESULTS_REPORTS_DIR / "cartesian_validation_report.md"
+    report_path = args.report_path
+    report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text("\n".join(report_lines), encoding="utf-8")
 
     print("Validation passed.")

@@ -3,7 +3,7 @@
   "columns": 180,
   "target_column": "y",
   "dropped_bad_rows": 0,
-  "path": "/Users/adhamhaithameid/Desktop/soft computing - research/data/raw/epileptic_seizure_recognition/epileptic_seizure_data.csv",
+  "path": "data/raw/epileptic_seizure_recognition/epileptic_seizure_data.csv",
   "dataset": "Epileptic Seizure Recognition",
   "source": "Kaggle/UCI source",
   "selected_source_url": "cached_local_file",

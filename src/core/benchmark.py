@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import json
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from typing import Dict, List, Tuple
 
 import numpy as np
@@ -83,7 +85,7 @@ def _ga_select_mask(
         cols = np.where(fix_mask(mask.copy()) == 1)[0]
         if cols.size == 0:
             return 0.0
-        clf = LinearSVC(max_iter=1200, random_state=RANDOM_STATE)
+        clf = LinearSVC(max_iter=5000, tol=1e-3, random_state=RANDOM_STATE)
         clf.fit(X_tr[:, cols], y_tr)
         pred = clf.predict(X_va[:, cols])
         acc = accuracy_score(y_va, pred)
@@ -184,7 +186,7 @@ def _apply_selection(
     if method == "wrapper_sfs":
         X_sel, y_sel = _sample_for_selection(X_train, y_train, max_samples=700)
         n_select = clamp_feature_count(8, X_sel.shape[1])
-        est = LinearSVC(max_iter=1200, random_state=RANDOM_STATE)
+        est = LinearSVC(max_iter=5000, tol=1e-3, random_state=RANDOM_STATE)
         sfs = SequentialFeatureSelector(
             est,
             n_features_to_select=n_select,
@@ -199,7 +201,7 @@ def _apply_selection(
 
     if method == "wrapper_rfe":
         n_select = clamp_feature_count(20, n_features)
-        est = LinearSVC(max_iter=1200, random_state=RANDOM_STATE)
+        est = LinearSVC(max_iter=5000, tol=1e-3, random_state=RANDOM_STATE)
         rfe = RFE(estimator=est, n_features_to_select=n_select, step=0.1)
         rfe.fit(X_train, y_train)
         mask = rfe.get_support()
@@ -210,7 +212,8 @@ def _apply_selection(
             penalty="l1",
             dual=False,
             C=0.5,
-            max_iter=2000,
+            max_iter=6000,
+            tol=1e-3,
             random_state=RANDOM_STATE,
         )
         sfm = SelectFromModel(estimator=est, threshold="median")
@@ -282,6 +285,14 @@ def _failed_metrics_row(reason: str) -> Dict[str, object]:
     }
 
 
+def _format_hms(seconds: float) -> str:
+    """Format elapsed seconds as HH:MM:SS for concise progress logs."""
+    total = max(0, int(seconds))
+    h, rem = divmod(total, 3600)
+    m, s = divmod(rem, 60)
+    return f"{h:02d}:{m:02d}:{s:02d}"
+
+
 def _evaluate_model_row(
     model_name: str,
     X_train: np.ndarray,
@@ -321,15 +332,34 @@ def run_cartesian_benchmark(
     selection_jobs: int = 1,
     execution_device: str = "cpu",
     acceleration_backend: str = "none",
+    checkpoint_percent: int = 5,
+    run_label: str = "",
+    platform_profile: str = "",
 ) -> pd.DataFrame:
-    started = time.perf_counter()
+    started_perf = time.perf_counter()
+    started_utc = datetime.now(timezone.utc)
+
+    # Normalize user inputs for robust, deterministic checkpoint behavior.
+    cp_percent = max(1, min(100, int(checkpoint_percent or 5)))
+    target_total_rows = spec.expected_fold_evals
+    if max_rows is not None:
+        target_total_rows = min(spec.expected_fold_evals, max(0, int(max_rows)))
 
     records_buffer: List[Dict[str, object]] = []
-    write_count = 0
+    written_new_rows = 0
+
+    previous_manifest: Dict[str, object] = {}
+    if resume and io.manifest_json.exists():
+        try:
+            previous_manifest = json.loads(io.manifest_json.read_text(encoding="utf-8"))
+        except Exception:
+            previous_manifest = {}
 
     seen = set()
+    existing_count = 0
     if resume and io.metrics_csv.exists():
         existing = pd.read_csv(io.metrics_csv)
+        existing_count = int(len(existing))
         for _, r in existing.iterrows():
             key = (
                 str(r["track"]),
@@ -341,6 +371,60 @@ def run_cartesian_benchmark(
             )
             seen.add(key)
 
+    def total_rows_so_far() -> int:
+        return existing_count + written_new_rows + len(records_buffer)
+
+    def at_target_limit() -> bool:
+        return total_rows_so_far() >= target_total_rows
+
+    def flush_buffer(force: bool = False) -> None:
+        nonlocal records_buffer, written_new_rows
+        if not records_buffer:
+            return
+        if not force and len(records_buffer) < io.checkpoint_every:
+            return
+
+        df_chk = pd.DataFrame(records_buffer)
+        overwrite = (not io.metrics_csv.exists()) and existing_count == 0 and written_new_rows == 0
+        append_checkpoint(io, df_chk, overwrite=overwrite)
+        written_new_rows += len(records_buffer)
+        records_buffer = []
+
+    progress_marks: List[Tuple[int, int]] = []
+    for percent in range(cp_percent, 101, cp_percent):
+        threshold_rows = int(np.ceil(target_total_rows * (percent / 100.0)))
+        progress_marks.append((percent, max(1, threshold_rows)))
+
+    progress_idx = 0
+    while progress_idx < len(progress_marks) and total_rows_so_far() >= progress_marks[progress_idx][1]:
+        progress_idx += 1
+
+    def emit_progress_if_needed() -> None:
+        nonlocal progress_idx
+        current_total = total_rows_so_far()
+        while progress_idx < len(progress_marks) and current_total >= progress_marks[progress_idx][1]:
+            # Write a durable checkpoint exactly at each progress threshold.
+            flush_buffer(force=True)
+            current_total = total_rows_so_far()
+            percent, _ = progress_marks[progress_idx]
+            elapsed = time.perf_counter() - started_perf
+            processed_this_invocation = max(1, written_new_rows + len(records_buffer))
+            rate = processed_this_invocation / max(elapsed, 1e-9)
+            remaining = max(0, target_total_rows - current_total)
+            eta_sec = remaining / rate if rate > 0 else float("inf")
+            eta_text = _format_hms(eta_sec) if np.isfinite(eta_sec) else "unknown"
+            print(
+                f"[checkpoint] {percent}% complete "
+                f"({current_total}/{target_total_rows}) "
+                f"elapsed={_format_hms(elapsed)} eta={eta_text}"
+            )
+            progress_idx += 1
+
+    def add_record(row: Dict[str, object]) -> None:
+        records_buffer.append(row)
+        flush_buffer(force=False)
+        emit_progress_if_needed()
+
     X = X_df.to_numpy(dtype=float)
 
     tracks = {
@@ -348,16 +432,47 @@ def run_cartesian_benchmark(
         "multiclass": y_multiclass,
     }
 
+    if target_total_rows <= 0:
+        raise ValueError("target_total_rows resolved to 0. Increase --max-rows or remove it.")
+
     for track_name in spec.tracks:
         y = tracks[track_name]
         binary = track_name == "binary"
         skf = StratifiedKFold(n_splits=spec.cv_splits, shuffle=True, random_state=RANDOM_STATE)
 
         for fold, (train_idx, test_idx) in enumerate(skf.split(X, y), start=1):
+            if at_target_limit():
+                break
             X_train_raw, X_test_raw = X[train_idx], X[test_idx]
             y_train, y_test = y[train_idx], y[test_idx]
 
             for prep_name in spec.preprocessing:
+                if at_target_limit():
+                    break
+                # Fast resume: skip expensive preprocessing branch if every downstream
+                # combination for this (track, fold, preprocessing) is already present.
+                pending_prep = False
+                for red_name_probe in spec.reduction:
+                    for sel_name_probe in spec.selection:
+                        for model_name_probe in spec.classifiers:
+                            key_probe = (
+                                track_name,
+                                fold,
+                                prep_name,
+                                red_name_probe,
+                                sel_name_probe,
+                                model_name_probe,
+                            )
+                            if key_probe not in seen:
+                                pending_prep = True
+                                break
+                        if pending_prep:
+                            break
+                    if pending_prep:
+                        break
+                if not pending_prep:
+                    continue
+
                 try:
                     prep = build_preprocessor(prep_name)
                     Xp_train = prep.fit_transform(X_train_raw)
@@ -367,10 +482,12 @@ def run_cartesian_benchmark(
                     for red_name in spec.reduction:
                         for sel_name in spec.selection:
                             for model_name in spec.classifiers:
+                                if at_target_limit():
+                                    break
                                 key = (track_name, fold, prep_name, red_name, sel_name, model_name)
                                 if key in seen:
                                     continue
-                                records_buffer.append(
+                                add_record(
                                     {
                                         "track": track_name,
                                         "fold": fold,
@@ -393,6 +510,27 @@ def run_cartesian_benchmark(
                     continue
 
                 for red_name in spec.reduction:
+                    if at_target_limit():
+                        break
+                    pending_red = False
+                    for sel_name_probe in spec.selection:
+                        for model_name_probe in spec.classifiers:
+                            key_probe = (
+                                track_name,
+                                fold,
+                                prep_name,
+                                red_name,
+                                sel_name_probe,
+                                model_name_probe,
+                            )
+                            if key_probe not in seen:
+                                pending_red = True
+                                break
+                        if pending_red:
+                            break
+                    if not pending_red:
+                        continue
+
                     reduction_ok = True
                     red_reason = ""
                     try:
@@ -403,6 +541,17 @@ def run_cartesian_benchmark(
                         Xr_train, Xr_test = Xp_train, Xp_test
 
                     for sel_name in spec.selection:
+                        if at_target_limit():
+                            break
+                        model_names: List[str] = []
+                        for model_name in spec.classifiers:
+                            key = (track_name, fold, prep_name, red_name, sel_name, model_name)
+                            if key in seen:
+                                continue
+                            model_names.append(model_name)
+                        if not model_names:
+                            continue
+
                         selection_ok = True
                         sel_reason = ""
                         try:
@@ -423,18 +572,10 @@ def run_cartesian_benchmark(
                             sel_reason = f"selection_failed: {failure_reason(exc)}"
                             Xs_train, Xs_test = Xr_train, Xr_test
 
-                        model_names: List[str] = []
-                        for model_name in spec.classifiers:
-                            key = (track_name, fold, prep_name, red_name, sel_name, model_name)
-                            if key in seen:
-                                continue
-                            model_names.append(model_name)
-
-                        if max_rows is not None:
-                            remaining = max_rows - (write_count + len(records_buffer))
-                            if remaining <= 0:
-                                break
-                            model_names = model_names[:remaining]
+                        remaining = target_total_rows - total_rows_so_far()
+                        if remaining <= 0:
+                            break
+                        model_names = model_names[:remaining]
 
                         base_row = {
                             "track": track_name,
@@ -449,7 +590,7 @@ def run_cartesian_benchmark(
                                 row = dict(base_row)
                                 row["model"] = model_name
                                 row.update(_failed_metrics_row(sel_reason))
-                                records_buffer.append(row)
+                                add_record(row)
                         else:
                             if model_jobs <= 1 or len(model_names) <= 1:
                                 for model_name in model_names:
@@ -464,7 +605,7 @@ def run_cartesian_benchmark(
                                             binary=binary,
                                         )
                                     )
-                                    records_buffer.append(row)
+                                    add_record(row)
                             else:
                                 result_map: Dict[str, Dict[str, object]] = {}
                                 with ThreadPoolExecutor(max_workers=min(model_jobs, len(model_names))) as ex:
@@ -495,30 +636,17 @@ def run_cartesian_benchmark(
                                 for model_name in model_names:
                                     row = dict(base_row)
                                     row.update(result_map[model_name])
-                                    records_buffer.append(row)
+                                    add_record(row)
 
-                            if len(records_buffer) >= io.checkpoint_every:
-                                df_chk = pd.DataFrame(records_buffer)
-                                append_checkpoint(io, df_chk, overwrite=(not io.metrics_csv.exists() and write_count == 0))
-                                write_count += len(records_buffer)
-                                records_buffer = []
+    # Final durable checkpoint.
+    flush_buffer(force=True)
+    emit_progress_if_needed()
 
-                            if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-                                break
-                        if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-                            break
-                    if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-                        break
-                if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-                    break
-            if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-                break
-        if max_rows is not None and (write_count + len(records_buffer)) >= max_rows:
-            break
-
-    if records_buffer:
-        df_chk = pd.DataFrame(records_buffer)
-        append_checkpoint(io, df_chk, overwrite=(not io.metrics_csv.exists() and write_count == 0))
+    if not io.metrics_csv.exists():
+        raise FileNotFoundError(
+            f"Metrics file was not generated at {io.metrics_csv}. "
+            "Check dataset availability and runtime logs."
+        )
 
     df = pd.read_csv(io.metrics_csv)
 
@@ -542,12 +670,32 @@ def run_cartesian_benchmark(
     if len(summary[summary["track"] == "multiclass"]) > 0:
         best_multiclass = summary[summary["track"] == "multiclass"].iloc[0].to_dict()
 
+    finished_utc = datetime.now(timezone.utc)
+    runtime_last_invocation = float(time.perf_counter() - started_perf)
+    runtime_effective = runtime_last_invocation
+    if written_new_rows == 0 and "runtime_sec" in previous_manifest:
+        try:
+            runtime_effective = float(previous_manifest["runtime_sec"])
+        except Exception:
+            runtime_effective = runtime_last_invocation
+
     manifest = {
         "expected_combos": spec.expected_combos,
         "expected_fold_evals": spec.expected_fold_evals,
+        "target_total_rows": int(target_total_rows),
+        "rows_written": int(len(df)),
         "completed_ok": int((df["status"] == "ok").sum()),
         "skipped_or_failed": int((df["status"] != "ok").sum()),
-        "runtime_sec": float(time.perf_counter() - started),
+        "runtime_sec": runtime_effective,
+        "runtime_sec_last_invocation": runtime_last_invocation,
+        "started_utc": started_utc.isoformat(),
+        "finished_utc": finished_utc.isoformat(),
+        "checkpoint_percent": cp_percent,
+        "resume_mode": bool(resume),
+        "resume_noop": bool(written_new_rows == 0),
+        "max_rows": None if max_rows is None else int(max_rows),
+        "run_label": run_label,
+        "platform_profile": platform_profile,
         "execution_device": execution_device,
         "acceleration_backend": acceleration_backend,
         "best_binary": best_binary,

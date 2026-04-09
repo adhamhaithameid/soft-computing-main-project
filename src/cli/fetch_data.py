@@ -115,12 +115,19 @@ def _clean_csv(path: Path) -> dict:
         writer.writerows(clean)
 
     target_col = "y" if "y" in header else header[-1]
+    relative_path = str(path)
+    try:
+        relative_path = str(path.relative_to(ROOT))
+    except Exception:
+        # Fallback keeps behavior stable if ROOT cannot be resolved for any reason.
+        relative_path = str(path)
+
     return {
         "rows": len(clean) - 1,
         "columns": n_cols,
         "target_column": target_col,
         "dropped_bad_rows": bad_rows,
-        "path": str(path),
+        "path": relative_path,
     }
 
 

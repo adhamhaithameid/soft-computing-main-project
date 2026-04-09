@@ -100,7 +100,8 @@ def build_preprocessor(name: str):
 
 def model_registry() -> Dict[str, object]:
     return {
-        "knn": KNeighborsClassifier(n_neighbors=5, n_jobs=-1),
+        # Keep per-model threading conservative; outer cartesian parallelism controls CPU fan-out.
+        "knn": KNeighborsClassifier(n_neighbors=5, n_jobs=1),
         "svm": SVC(kernel="rbf", C=1.0, gamma="scale", probability=True, random_state=RANDOM_STATE),
         "decision_tree": DecisionTreeClassifier(max_depth=12, random_state=RANDOM_STATE),
         "logistic_regression": LogisticRegression(max_iter=1000, solver="lbfgs"),

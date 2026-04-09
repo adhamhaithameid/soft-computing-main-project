@@ -5,12 +5,15 @@ from __future__ import annotations
 
 import argparse
 import os
+import platform
 import sys
+import warnings
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy.stats import kurtosis, skew
+from sklearn.exceptions import ConvergenceWarning
 
 ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
@@ -105,6 +108,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--max-rows", type=int, default=None, help="Optional cap for smoke testing.")
     parser.add_argument("--checkpoint-every", type=int, default=100)
+    parser.add_argument(
+        "--checkpoint-percent",
+        type=int,
+        default=5,
+        help="Emit durable checkpoint + terminal progress at this percent step (default: 5).",
+    )
     parser.add_argument("--fresh", action="store_true", help="Start fresh and overwrite old metrics file.")
     parser.add_argument(
         "--device",
@@ -129,7 +138,33 @@ def main() -> None:
         default=1,
         help="Parallel workers for wrapper SFS internal CV (default: 1).",
     )
+    parser.add_argument(
+        "--platform-profile",
+        choices=["auto", "linux", "mac", "windows"],
+        default="auto",
+        help="Profile label stored in manifest for reproducibility docs.",
+    )
+    parser.add_argument(
+        "--run-label",
+        type=str,
+        default="",
+        help="Optional external run id (for run history tracking).",
+    )
+    parser.add_argument(
+        "--show-convergence-warnings",
+        action="store_true",
+        help="Show sklearn convergence warnings (hidden by default for clean logs).",
+    )
     args = parser.parse_args()
+
+    if not args.show_convergence_warnings:
+        # Keeps terminal logs clean during long runs while preserving metrics integrity.
+        warnings.filterwarnings("ignore", category=ConvergenceWarning)
+        warnings.filterwarnings(
+            "ignore",
+            message="n_quantiles .* is greater than the total number of samples",
+            category=UserWarning,
+        )
 
     accel = configure_acceleration(device=args.device, strict=args.strict_device)
     print(
@@ -179,6 +214,9 @@ def main() -> None:
         selection_jobs=max(1, args.selection_jobs),
         execution_device=accel.resolved,
         acceleration_backend=accel.backend,
+        checkpoint_percent=max(1, min(100, args.checkpoint_percent)),
+        run_label=args.run_label.strip(),
+        platform_profile=args.platform_profile,
     )
 
     ok = df[df["status"] == "ok"].copy()
@@ -206,8 +244,13 @@ def main() -> None:
     print(f"Saved plots: {len(plots)}")
     print(f"Model jobs: {max(1, args.jobs)}")
     print(f"Selection jobs: {max(1, args.selection_jobs)}")
+    print(f"Checkpoint percent: {max(1, min(100, args.checkpoint_percent))}%")
     print(f"Execution device: {accel.resolved}")
     print(f"Acceleration backend: {accel.backend}")
+    print(f"Platform profile: {args.platform_profile}")
+    print(f"Host platform: {platform.platform()}")
+    if args.run_label:
+        print(f"Run label: {args.run_label}")
 
 
 if __name__ == "__main__":

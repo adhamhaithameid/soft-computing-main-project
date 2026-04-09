@@ -23,20 +23,20 @@ Epileptic seizure recognition is a high-impact classification problem where robu
 To address this, the project was redesigned as a Cartesian benchmark framework where each method family is explicitly enumerated and evaluated under a common protocol. This allows direct, transparent comparison between preprocessing, reduction, selection, and model choices.
 
 ## 2. Related Work
-Add at least 10 seizure/EEG classification studies with method and metric comparisons.
+Recent seizure-detection studies span classical machine learning, hybrid feature engineering, and deep-learning-assisted classifiers. Reported performance is often high on Bonn EEG and CHB-MIT variants, but direct comparison remains difficult because preprocessing, feature pipelines, and validation protocols vary across papers.
 
 | Ref No. | Paper | Year | Methods | Reported Results |
 |:--:|:--|:--:|:--|:--|
-| [R1] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R2] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R3] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R4] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R5] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R6] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R7] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R8] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R9] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
-| [R10] | [Add paper] | [Year] | [Methods] | [Accuracy/F1/AUC] |
+| [R1] | Siddiqui et al., *Brain Informatics* | 2020 | Review of ML classifiers for seizure detection | Summarized classifier trends and highlighted EEG noise/non-stationarity challenges. |
+| [R2] | Liu et al., *Technology and Health Care* | 2017 | Temporal + wavelet features + kernel ELM | Reported satisfactory accuracy with lower computation time. |
+| [R3] | Chen et al., *BMC Med Inform Decis Mak* | 2023 | DWT + entropy/STD feature fusion + RF feature selection + CNN | Bonn interictal/ictal: 99.9% accuracy; New Delhi interictal/ictal: 100% in their setup. |
+| [R4] | Khalid et al., *DIGITAL HEALTH* | 2024 | ICA + prediction-probability features (FIR) + SVM | Reported 98.4% accuracy. |
+| [R5] | Saranya & Bharathi, *JIFS* | 2024 | Hybrid IANFIS-LightGBM | Reported strongest classification performance among compared methods on Bonn and CHB-MIT records. |
+| [R6] | Atlam et al., *Applied Sciences* | 2025 | PCA + DWT hybrid feature selection + SMOTE + SVM | Reported 97.30% accuracy, 99.62% AUC, 93.08% F1. |
+| [R7] | Berrich & Guennoun, *Scientific Reports* | 2025 | PCA-based dimensionality reduction + CNN-SVM/DNN-SVM | Proposed hybrid deep+SVM EEG detection framework with dimensionality reduction. |
+| [R8] | Chakrabarti et al., *JAISE* | 2022 | Moving-window pediatric seizure recognition with RF/DT/ANN/ensemble | RF best: 91.9% accuracy, 94.1% sensitivity, 89.7% specificity. |
+| [R9] | Andrzejak et al., *Physical Review E* | 2001 | Nonlinear dynamics analysis of EEG brain states | Foundational EEG-state analysis used in building the widely used Bonn benchmark structure. |
+| [R10] | Shoeb et al., *IEEE EMBC* | 2004 | Patient-specific seizure onset detection from EEG | Early influential patient-specific onset-detection framework. |
 
 ## 3. Methodology
 ### 3.1 Dataset
@@ -162,4 +162,22 @@ Future work:
 3. Add statistical significance tests between top pipelines.
 
 ## 7. References
-Use APA style and map citations consistently between text and bibliography.
+[R1] Siddiqui, M. K., Morales-Menendez, R., Huang, X., & Hussain, N. (2020). A review of epileptic seizure detection using machine learning classifiers. *Brain Informatics, 7*(1), Article 5. https://doi.org/10.1186/s40708-020-00105-1
+
+[R2] Liu, Q., Zhao, X., Hou, Z., & Liu, H. (2017). Epileptic seizure detection based on the kernel extreme learning machine. *Technology and Health Care, 25*(S1), 399-409. https://doi.org/10.3233/THC-171343
+
+[R3] Chen, W., Wang, Y., Ren, Y., Jiang, H., Du, G., Zhang, J., & Li, J. (2023). An automated detection of epileptic seizures EEG using CNN classifier based on feature fusion with high accuracy. *BMC Medical Informatics and Decision Making, 23*(1), Article 96. https://doi.org/10.1186/s12911-023-02180-w
+
+[R4] Khalid, M., Raza, A., Akhtar, A., Rustam, F., Ballester, J. B., Rodriguez, C. L., Díez, I. T., & Ashraf, I. (2024). Diagnosing epileptic seizures using combined features from independent components and prediction probability from EEG data. *DIGITAL HEALTH, 10*. https://doi.org/10.1177/20552076241277185
+
+[R5] Saranya, D., & Bharathi, A. (2024). Automatic detection of epileptic seizure using machine learning-based IANFIS-LightGBM system. *Journal of Intelligent & Fuzzy Systems, 46*(1), 2463-2482. https://doi.org/10.3233/JIFS-233430
+
+[R6] Atlam, H. F., Aderibigbe, G. E., & Nadeem, M. S. (2025). Effective epileptic seizure detection with hybrid feature selection and SMOTE-based data balancing using SVM classifier. *Applied Sciences, 15*(9), 4690. https://doi.org/10.3390/app15094690
+
+[R7] Berrich, Y., & Guennoun, Z. (2025). EEG-based epilepsy detection using CNN-SVM and DNN-SVM with feature dimensionality reduction by PCA. *Scientific Reports, 15*(1), Article 14313. https://doi.org/10.1038/s41598-025-95831-z
+
+[R8] Chakrabarti, S., Swetapadma, A., & Pattnaik, P. K. (2022). An improved method for recognizing pediatric epileptic seizures based on advanced learning and moving window technique. *Journal of Ambient Intelligence and Smart Environments, 14*(1), 39-59. https://doi.org/10.3233/AIS-210042
+
+[R9] Andrzejak, R. G., Lehnertz, K., Mormann, F., Rieke, C., David, P., & Elger, C. E. (2001). Indications of nonlinear deterministic and finite-dimensional structures in time series of brain electrical activity: Dependence on recording region and brain state. *Physical Review E, 64*(6). https://doi.org/10.1103/PhysRevE.64.061907
+
+[R10] Shoeb, A., Edwards, H., Connolly, J., Bourgeois, B., Treves, T., & Guttag, J. (2004). Patient-specific seizure onset detection. In *The 26th Annual International Conference of the IEEE Engineering in Medicine and Biology Society* (Vol. 3, pp. 419-422). https://doi.org/10.1109/IEMBS.2004.1403183

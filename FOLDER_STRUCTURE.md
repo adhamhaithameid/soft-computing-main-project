@@ -1,44 +1,33 @@
 # Folder Structure
 
 ```text
-soft computing - research/
+soft-computing-main-project/
 ├── assets/
 │   └── lectures/
 ├── data/
 │   ├── raw/
-│   │   └── epileptic_seizure_recognition/
-│   │       ├── epileptic_seizure_data.csv
-│   │       └── metadata.json
 │   ├── interim/
 │   ├── processed/
 │   └── catalog/
-│       └── links.md
 ├── notebooks/
 │   ├── colab/
-│   │   ├── epileptic_seizure_full_pipeline_colab.ipynb
-│   │   └── README.md
 │   ├── kaggle/
 │   └── local/
 ├── src/
+│   ├── cli/
 │   ├── config/
-│   │   └── paths.py
 │   ├── core/
-│   │   ├── cartesian_pipeline.py
-│   │   ├── benchmark.py
-│   │   ├── comparisons.py
-│   │   ├── plots.py
-│   │   └── runner.py
-│   └── cli/
-│       ├── fetch_data.py
-│       ├── check_env.py
-│       ├── run_experiments.py
-│       └── generate_paper_drafts.py
+│   └── runtime/
 ├── results/
 │   ├── metrics/
 │   ├── tables/
 │   ├── figures/
 │   ├── folds/
-│   └── reports/
+│   ├── reports/
+│   └── history/
+│       ├── runs/
+│       ├── RUN_HISTORY.md
+│       └── run_history.json
 ├── paper/
 │   ├── template/
 │   ├── draft/
@@ -55,18 +44,17 @@ soft computing - research/
 ├── FOLDER_STRUCTURE.md
 ├── ABOUT.md
 ├── requirements.txt
+├── run_all.py
 ├── run_all.sh
+├── run_all.ps1
+├── run_all.bat
 └── .gitignore
 ```
 
-## Root Policy
-Root keeps only top-level guides + run files:
-- `README.md`
-- `PROJECT_MASTER_GUIDE.md`
-- `FOLDER_STRUCTURE.md`
-- `ABOUT.md`
-- `requirements.txt`
-- `run_all.sh`
-- `.gitignore`
-
-All detailed docs are under `docs/*`.
+## Fast Navigation
+- Run everything: `run_all.py`
+- Core benchmark logic: `src/core/`
+- CLI entrypoints: `src/cli/`
+- Final outputs: `results/`
+- Paper writing files: `paper/`
+- Planning docs: `docs/`

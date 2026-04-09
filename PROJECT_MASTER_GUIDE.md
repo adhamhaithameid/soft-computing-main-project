@@ -1,98 +1,89 @@
-# Soft Computing Main Project - Master Guide
+# Project Master Guide
 
-## Repository
-- GitHub: https://github.com/adhamhaithameid/soft-computing-main-project
-- Colab notebook: https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
-
-## 1) Goal
-Build a complete Soft Computing course project with:
-- dataset decision
-- preprocessing
-- feature reduction
-- feature selection
-- classifier benchmarking
-- accuracy/F1 comparisons and plots
-- paper-ready draft outputs
+## 1) Project Purpose
+This repository is the Soft Computing course main project.  
+It benchmarks a full pipeline for **Epileptic Seizure Recognition** and produces:
+- metrics,
+- comparisons,
+- figures,
+- validation reports,
+- paper-ready draft content.
 
 ## 2) Dataset Decision
 Selected dataset: **Epileptic Seizure Recognition**.
 
-Reason:
-- Tabular structure is easiest to preprocess.
-- Works cleanly with PCA/LDA/SVD and all requested selection methods.
-- Supports both binary and multiclass tracks.
+Why this dataset:
+- tabular numeric structure is easy to preprocess,
+- supports all requested reduction/selection methods,
+- supports both binary and multiclass tasks.
 
-## 3) Refactored Architecture
-- Lectures: `assets/lectures/`
-- Data: `data/raw`, `data/interim`, `data/processed`, `data/catalog`
-- Notebooks: `notebooks/colab`, `notebooks/kaggle`, `notebooks/local`
-- Source code: `src/config`, `src/core`, `src/cli`
-- Outputs: `results/metrics`, `results/tables`, `results/figures`, `results/folds`, `results/reports`
-- Paper files: `paper/template`, `paper/draft`, `paper/tables`, `paper/figures`, `paper/references`
-- Documentation: `docs/plans`, `docs/guides`, `docs/status`, `docs/paper`
-
-## 4) Cartesian Benchmark Contract
+## 3) Benchmark Design
 - Tracks: `binary`, `multiclass`
 - CV folds: `3`
-- Preprocessing: `4` methods
-- Reduction: `4` methods
-- Selection: `8` methods
-- Classifiers: `6` methods
+- Preprocessing: `4`
+- Reduction: `4`
+- Selection: `8`
+- Classifiers: `6`
 
-Combination count:
-- Unique combos: `4 x 4 x 8 x 6 x 2 = 1536`
-- Fold evaluations: `1536 x 3 = 4608`
+Combinations:
+- Unique combos: `1536`
+- Fold evaluations: `4608`
 
-## 5) Core Outputs
+## 4) Run Modes
+You can run in:
+1. `cpu` mode
+2. `gpu` mode
+
+Use interactive launcher:
+```bash
+python run_all.py
+```
+
+Or explicit command:
+```bash
+python run_all.py --mode cpu --platform-profile linux --non-interactive --fresh
+```
+
+## 5) Progress + Checkpoints
+- Terminal progress and durable checkpoints are written every **5%** by default.
+- Configurable via `--checkpoint-percent`.
+
+## 6) Validation Report
+Validation is generated automatically in:
+- `results/reports/cartesian_validation_report.md`
+
+The report includes:
+- expected vs actual counts,
+- pass/fail state,
+- runtime,
+- device/backend,
+- skip-reason summary.
+
+## 7) Run History
+Each launcher execution is archived as:
+- `results/history/runs/runN_<timestamp>/`
+
+Global run index:
+- `results/history/RUN_HISTORY.md`
+- `results/history/run_history.json`
+
+## 8) Main Outputs
 - `results/metrics/cartesian_metrics_all.csv`
 - `results/metrics/cartesian_run_manifest.json`
 - `results/tables/cartesian_summary_by_combo.csv`
 - `results/tables/cartesian_rankings_binary.csv`
 - `results/tables/cartesian_rankings_multiclass.csv`
 - `results/reports/cartesian_comparison_report.md`
+- `results/reports/cartesian_validation_report.md`
 - `results/figures/cartesian_*.png`
 
-## 6) How to Run
-```bash
-python3.11 -m venv .venv311
-source .venv311/bin/activate
-python -m pip install --disable-pip-version-check -r requirements.txt
-./run_all.sh
-```
+## 9) Paper Deliverables
+- `paper/draft/09_full_paper_draft_mapped_to_template.md`
+- `RESEARCH_PAPER_FINAL_DRAFT.md`
 
-Or run the Colab notebook in `notebooks/colab/`.
-
-## 7) Latest Full-Run Snapshot (M1)
-Executed on April 9, 2026 (Apple Silicon M1, CPU mode).
-
-Main command:
-```bash
-source .venv311/bin/activate
-CORES=$(sysctl -n hw.ncpu)
-export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 MPLBACKEND=Agg
-caffeinate -dimsu python src/cli/run_experiments.py --fresh --device cpu --checkpoint-every 120 --jobs "$CORES" --selection-jobs "$CORES"
-```
-
-Observed run metrics:
-- Runtime: `5294.26 sec` (`88.24 min`)
-- Expected fold evals: `4608`
-- Completed OK: `4392`
-- Skipped/failed: `216`
-
-Best pipelines:
-- Binary: `svm + quantile + pca + none` with `accuracy=0.976261`, `f1=0.939349`
-- Multiclass: `mlp_ann + minmax + pca + none` with `accuracy=0.685651`, `f1=0.685026`
-
-Validation and draft generation:
-```bash
-python src/cli/validate_cartesian_outputs.py
-python src/cli/generate_paper_drafts.py
-```
-
-## 8) Where To Read Next
-- Folder map: `FOLDER_STRUCTURE.md`
-- Colab workflow: `docs/guides/colab_workflow.md`
-- Lecture understanding: `docs/guides/lecture_understanding.md`
-- Current status: `docs/status/current_status.md`
-- Migration notes: `docs/status/migration_notes.md`
-- Paper writing plan: `docs/paper/paper_writing_plan.md`
+## 10) Suggested Workflow for Course Submission
+1. Run full benchmark (`run_all.py`).
+2. Confirm validation PASS.
+3. Inspect top tables/figures.
+4. Update paper intro/discussion wording if needed.
+5. Export selected tables/figures into your final submission package.

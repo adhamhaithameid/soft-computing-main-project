@@ -1,155 +1,123 @@
-# Soft Computing Main Project
+# Soft Computing Course Project
 
-This repository contains a refactored Soft Computing course project for **Epileptic Seizure Recognition** with a full staged Cartesian benchmark.
+End-to-end benchmark lab for **Epileptic Seizure Recognition** with:
+- full Cartesian benchmarking (1536 combinations, 4608 fold evaluations),
+- CPU or GPU execution modes,
+- automated checkpoints every 5% progress,
+- reproducible outputs (metrics, tables, figures, reports),
+- paper drafting assets mapped to the course template.
 
-## Open in Colab
-- Direct URL: [epileptic_seizure_full_pipeline_colab.ipynb](https://colab.research.google.com/github/adhamhaithameid/soft-computing-main-project/blob/main/notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb)
-- Notebook path: `notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
-
-## Benchmark Design
-- Tracks: `binary`, `multiclass`
-- CV folds: `3`
-- Preprocessing: `standard`, `minmax`, `robust`, `quantile`
-- Reduction: `none`, `pca`, `lda_projection`, `svd`
-- Selection: `none`, `filter_chi2`, `filter_anova`, `filter_correlation`, `wrapper_sfs`, `wrapper_rfe`, `embedded_l1`, `ga_selection`
+## 1) What This Project Delivers
+- Preprocessing comparison: `standard`, `minmax`, `robust`, `quantile`
+- Feature reduction: `none`, `pca`, `lda_projection`, `svd`
+- Feature selection:
+  - Filter: `filter_chi2`, `filter_anova`, `filter_correlation`
+  - Wrapper: `wrapper_sfs`, `wrapper_rfe`
+  - Embedded: `embedded_l1`
+  - Evolutionary: `ga_selection`
 - Classifiers: `knn`, `svm`, `decision_tree`, `logistic_regression`, `lda_classifier`, `mlp_ann`
+- Tracks: `binary` + `multiclass`
+- CV: `3` folds
 
-## How combinations are counted
+Combination count:
 - Unique combinations: `4 x 4 x 8 x 6 x 2 = 1536`
 - Fold evaluations: `1536 x 3 = 4608`
 
-## Output Schema Contract
-`results/metrics/cartesian_metrics_all.csv` columns:
-- `track, fold, preprocessing, reduction, selection, model`
-- `accuracy, precision, recall, f1, roc_auc, error_rate`
-- `fit_time_sec, predict_time_sec, status, skip_reason`
-
-`results/metrics/cartesian_run_manifest.json` fields:
-- `expected_combos, expected_fold_evals`
-- `completed_ok, skipped_or_failed, runtime_sec`
-- `execution_device, acceleration_backend`
-- `best_binary, best_multiclass`
-
-## Run on Linux, macOS, and Windows
-
-### 1) One-time setup (all platforms)
+## 2) Quick Start
 ```bash
-git clone https://github.com/adhamhaithameid/soft-computing-main-project.git
-cd soft-computing-main-project
 python -m venv .venv311
-```
-
-- Linux/macOS activate:
-```bash
-source .venv311/bin/activate
-```
-
-- Windows PowerShell activate:
-```powershell
-.venv311\Scripts\Activate.ps1
-```
-
-- Install dependencies:
-```bash
+source .venv311/bin/activate   # Windows PowerShell: .venv311\Scripts\Activate.ps1
 python -m pip install --upgrade pip setuptools wheel
-python -m pip install --disable-pip-version-check -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-### 2) Full pipeline (cross-platform command)
+Run interactive launcher:
 ```bash
-python run_all.py --fresh --device auto --checkpoint-every 120
+python run_all.py
 ```
 
-Wrapper scripts are also available:
-- Linux/macOS: `bash run_all.sh --fresh --device auto`
-- Windows PowerShell: `.\run_all.ps1 -Fresh -Device auto`
-- Windows cmd: `run_all.bat --fresh --device auto`
+You will choose:
+1. execution mode (`cpu` or `gpu`)
+2. platform profile (`linux`, `windows`, or `mac`)
 
-### 3) GPU mode (NVIDIA + RAPIDS, with fallback)
-The benchmark now supports `--device {auto,cpu,gpu}`:
-- `auto`: try GPU first, fallback to CPU when unavailable.
-- `cpu`: force CPU mode.
-- `gpu`: request GPU mode.
-- `--strict-device`: fail if `gpu` cannot be enabled.
-
-GPU acceleration is enabled through RAPIDS `cuml.accel` (zero-code-change sklearn acceleration where supported).  
-For Linux/NVIDIA installation, use RAPIDS official instructions for your CUDA/Python version:
-- https://docs.rapids.ai/install
-
-Run with strict GPU requirement:
+## 3) Non-Interactive Examples
+Full CPU run:
 ```bash
-python src/cli/check_env.py --device gpu --strict-device
-python src/cli/run_experiments.py --fresh --device gpu --strict-device --checkpoint-every 120
+python run_all.py --mode cpu --platform-profile linux --non-interactive --fresh
 ```
 
-### Resume after interruption
+Full GPU run (fallback allowed):
 ```bash
-python src/cli/run_experiments.py --device auto --checkpoint-every 120
+python run_all.py --mode gpu --platform-profile linux --non-interactive --fresh
 ```
-Do not use `--fresh` when resuming.
 
-### High-CPU mode (parallelism)
-- `--jobs`: parallel model evaluations per stage
-- `--selection-jobs`: parallel workers inside wrapper SFS
-
+Strict GPU run (fails if GPU acceleration is unavailable):
 ```bash
-python src/cli/run_experiments.py --fresh --device cpu --checkpoint-every 120 --jobs 8 --selection-jobs 8
+python run_all.py --mode gpu --strict-device --platform-profile linux --non-interactive --fresh
 ```
 
-Apple Silicon full-core run:
+Smoke test:
 ```bash
-source .venv311/bin/activate
-CORES=$(sysctl -n hw.ncpu)
-export OMP_NUM_THREADS=1
-export OPENBLAS_NUM_THREADS=1
-export MKL_NUM_THREADS=1
-export NUMEXPR_NUM_THREADS=1
-export MPLBACKEND=Agg
-
-caffeinate -dimsu bash -lc "source .venv311/bin/activate && python src/cli/run_experiments.py --fresh --device cpu --checkpoint-every 120 --jobs $CORES --selection-jobs $CORES"
+python run_all.py --mode cpu --platform-profile mac --non-interactive --fresh --max-rows 300 --allow-partial
 ```
 
-Smoke-test then partial validation:
+## 4) Checkpoints and Progress
+The benchmark writes durable checkpoints and prints terminal progress at every **5%** by default.
+
+You can change this:
 ```bash
-python src/cli/run_experiments.py --fresh --device cpu --max-rows 300 --checkpoint-every 30 --jobs 4 --selection-jobs 4
-python src/cli/validate_cartesian_outputs.py --allow-partial
+python run_all.py --checkpoint-percent 10 --non-interactive --mode cpu --platform-profile linux
 ```
 
-Full-run strict validation:
-```bash
-python src/cli/validate_cartesian_outputs.py
-```
+## 5) Run History (Automatic)
+Each `run_all.py` execution creates:
+- a run archive folder: `results/history/runs/runN_<timestamp>/`
+- a global run index: `results/history/RUN_HISTORY.md`
+- a machine-readable history file: `results/history/run_history.json`
 
-## Run from Colab
-1. Open the Colab link above.
-2. Run all cells from top to bottom.
-3. Use the config cell for smoke/full mode, checkpoint frequency, and method lists.
-4. Download `colab_outputs.zip` from the final cell if needed.
+Each run archive stores:
+- manifest snapshot,
+- validation report,
+- comparison report,
+- run summary with timing and configuration.
 
-## Interpreting failed/skipped rows
-- `status="ok"`: combo executed and metrics are valid.
-- `status="failed"`: combo was skipped or failed safely; details are in `skip_reason`.
-- Known auto-fixes:
-  - `chi2` uses non-negative transform when needed.
-  - Feature/component counts are dynamically clamped to valid ranges.
-
-## Main generated outputs
+## 6) Output Contracts
+Main metrics file:
 - `results/metrics/cartesian_metrics_all.csv`
-- `results/metrics/cartesian_run_manifest.json`
-- `results/tables/cartesian_summary_by_combo.csv`
-- `results/tables/cartesian_rankings_binary.csv`
-- `results/tables/cartesian_rankings_multiclass.csv`
-- `results/reports/cartesian_comparison_report.md`
-- `results/figures/cartesian_*.png`
-- `paper/draft/*.md`
+  - `track, fold, preprocessing, reduction, selection, model`
+  - `accuracy, precision, recall, f1, roc_auc, error_rate`
+  - `fit_time_sec, predict_time_sec, status, skip_reason`
 
-## Main entrypoints
+Manifest file:
+- `results/metrics/cartesian_run_manifest.json`
+  - `expected_combos, expected_fold_evals, target_total_rows`
+  - `rows_written, completed_ok, skipped_or_failed`
+  - `runtime_sec, started_utc, finished_utc`
+  - `checkpoint_percent, run_label, platform_profile`
+  - `execution_device, acceleration_backend`
+  - `best_binary, best_multiclass`
+
+Validation report:
+- `results/reports/cartesian_validation_report.md`
+
+## 7) Main Entrypoints
+- `run_all.py` (recommended launcher)
 - `src/cli/fetch_data.py`
 - `src/cli/check_env.py`
 - `src/cli/run_experiments.py`
+- `src/cli/validate_cartesian_outputs.py`
 - `src/cli/generate_paper_drafts.py`
 
-## Project guides
+## 8) Colab Notebook
+- `notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`
+
+## 9) Paper Assets
+- Template: `paper/template/`
+- Drafts: `paper/draft/`
+- Final mapped draft: `paper/draft/09_full_paper_draft_mapped_to_template.md`
+- Full draft copy: `RESEARCH_PAPER_FINAL_DRAFT.md`
+
+## 10) Additional Guides
 - `PROJECT_MASTER_GUIDE.md`
 - `FOLDER_STRUCTURE.md`
 - `ABOUT.md`

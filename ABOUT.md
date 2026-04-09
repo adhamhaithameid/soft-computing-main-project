@@ -1,23 +1,23 @@
-# About This Repository
+# About
 
-This repository is the Soft Computing main course project.
+This project is a Soft Computing course benchmark and reporting framework focused on epileptic seizure recognition.
 
-## Scope
-- Dataset decision and justification
-- End-to-end ML pipeline
-- Feature reduction and selection techniques
-- Multi-model benchmarking
-- Result analysis and research paper drafting
-
-## Course Methods Included
+## Included Method Families
+- Preprocessing: StandardScaler, MinMaxScaler, RobustScaler, QuantileTransformer
 - Reduction: PCA, LDA projection, SVD
-- Selection: Filter (chi2, ANOVA, correlation), Wrapper (SFS, RFE), Embedded (L1), Genetic Algorithm
-- Models: KNN, SVM, Decision Tree, Logistic Regression, LDA Classifier, MLP ANN
-- Metrics: Accuracy, Precision, Recall, F1, ROC-AUC, Error Rate
+- Selection: chi-square, ANOVA, correlation, SFS, RFE, embedded L1, genetic algorithm
+- Classifiers: KNN, SVM, Decision Tree, Logistic Regression, LDA classifier, MLP/ANN
 
-## Execution Modes
-- Local workflow (`run_all.sh`)
-- Google Colab notebook (`notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb`)
+## Project Outcomes
+- Full Cartesian evaluation across all stage combinations
+- Standardized metrics and manifests
+- Comparison tables and figures
+- Validation reports
+- Paper draft files mapped to template sections
 
-## Main Guide
-- `PROJECT_MASTER_GUIDE.md`
+## Intended Use
+Use this repository for:
+- course project execution,
+- reproducible experiments,
+- preparing figures/results for paper submission,
+- explaining pipeline design and outcomes during professor review.

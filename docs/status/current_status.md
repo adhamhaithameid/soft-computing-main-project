@@ -16,6 +16,28 @@
 - Unique combinations: 1536
 - Fold evaluations: 4608
 
+## Latest Verified Full Run (Apple Silicon M1, April 9, 2026)
+- Runtime: `5294.26 sec` (`88.24 min`)
+- Evaluation accounting:
+  - `expected_fold_evals = 4608`
+  - `completed_ok = 4392`
+  - `skipped_or_failed = 216`
+- Execution mode:
+  - `execution_device = cpu`
+  - `acceleration_backend = none`
+- Best binary pipeline:
+  - `svm + quantile + pca + none`
+  - `accuracy = 0.976261`, `f1 = 0.939349`, `roc_auc = 0.995438`
+- Best multiclass pipeline:
+  - `mlp_ann + minmax + pca + none`
+  - `accuracy = 0.685651`, `f1 = 0.685026`
+
+Top skip reasons (`216` total):
+- `72`: `selection_failed: ValueError: Found array with 1 feature(s) ... minimum of 2 is required by SequentialFeatureSelector.`
+- `72`: `selection_failed: ValueError: n_features_to_select must be < n_features.`
+- `48`: `selection_failed: ValueError: Found array with 1 feature(s) ... minimum of 2 is required by RFE. (shape=(7667, 1))`
+- `24`: `selection_failed: ValueError: Found array with 1 feature(s) ... minimum of 2 is required by RFE. (shape=(7666, 1))`
+
 ## Main commands
 ```bash
 python src/cli/fetch_data.py

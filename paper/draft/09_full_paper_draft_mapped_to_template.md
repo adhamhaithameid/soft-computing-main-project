@@ -106,17 +106,52 @@ Combination math:
 - `results/tables/cartesian_rankings_multiclass.csv`
 - `results/reports/cartesian_comparison_report.md`
 
-### 5.2 Result insertion points
-After full run completion, paste:
-- Top 10 binary rows from `cartesian_rankings_binary.csv`
-- Top 10 multiclass rows from `cartesian_rankings_multiclass.csv`
-- Skip/failure summary from `cartesian_metrics_all.csv` (`status`, `skip_reason`)
-- Best-model interpretation from `cartesian_comparison_report.md`
+### 5.2 Full Run Snapshot (April 9, 2026, M1 CPU)
+- Total fold evaluations: `4608 / 4608`
+- Successful rows: `4392`
+- Skipped/failed rows: `216`
+- Runtime: `5294.26 sec` (`88.24 min`)
 
-### 5.3 Discussion prompts
-- Which preprocessing method appears most stable by fold variance?
-- Which reduction/selection families improve F1 vs baseline (`none + none`)?
-- Which techniques fail/skip most frequently and why?
+Best pipelines from `cartesian_run_manifest.json`:
+- Binary: `svm + quantile + pca + none`  
+  `accuracy=0.976261`, `precision=0.960050`, `recall=0.919563`, `f1=0.939349`, `roc_auc=0.995438`
+- Multiclass: `mlp_ann + minmax + pca + none`  
+  `accuracy=0.685651`, `precision=0.685624`, `recall=0.685660`, `f1=0.685026`
+
+### 5.3 Top-Ranked Pipelines (Accuracy)
+Binary track (top 5):
+
+| Rank | Preprocessing | Reduction | Selection | Model | Accuracy | F1 | Delta vs baseline accuracy |
+|:---:|:---|:---|:---|:---|---:|---:|---:|
+| 1 | quantile | pca | none | svm | 0.976261 | 0.939349 | +0.000261 |
+| 2 | quantile | none | none | svm | 0.976000 | 0.938647 | +0.000000 |
+| 3 | quantile | svd | none | svm | 0.974608 | 0.934881 | -0.001391 |
+| 4 | quantile | none | embedded_l1 | svm | 0.973565 | 0.932277 | -0.002435 |
+| 5 | standard | svd | none | svm | 0.971913 | 0.927855 | -0.004087 |
+
+Multiclass track (top 5):
+
+| Rank | Preprocessing | Reduction | Selection | Model | Accuracy | F1 | Delta vs baseline accuracy |
+|:---:|:---|:---|:---|:---|---:|---:|---:|
+| 1 | minmax | pca | none | mlp_ann | 0.685651 | 0.685026 | +0.010956 |
+| 2 | standard | none | none | mlp_ann | 0.674696 | 0.675497 | +0.000000 |
+| 3 | standard | svd | none | mlp_ann | 0.671305 | 0.671783 | -0.003390 |
+| 4 | standard | pca | none | mlp_ann | 0.670869 | 0.671112 | -0.003826 |
+| 5 | robust | none | none | mlp_ann | 0.669740 | 0.670368 | -0.004956 |
+
+### 5.4 Failure and Skip Analysis
+All `216` non-OK rows were safe failures in feature selection edge cases:
+- `72`: SequentialFeatureSelector requires at least 2 features (`shape=(700, 1)` after prior stages).
+- `72`: `n_features_to_select` must be strictly less than available features.
+- `48`: RFE requires at least 2 features (`shape=(7667, 1)`).
+- `24`: RFE requires at least 2 features (`shape=(7666, 1)`).
+
+This pattern indicates the failure handling behaved as intended: invalid low-dimensional combinations were logged and skipped without stopping the full benchmark.
+
+### 5.5 Discussion
+- Binary performance was dominated by SVM variants, especially with `quantile` preprocessing and no extra selection.
+- Multiclass performance was dominated by MLP/ANN, with a clear gain from `minmax + pca` over the multiclass baseline.
+- Wrapper/embedded selectors did not consistently beat the `none` selection baseline in top-ranked rows for this dataset, suggesting that strong preprocessing/reduction choices contributed more than aggressive selection in this run.
 
 ## 6. Conclusion and Future Work
 This project delivers a complete, reproducible soft-computing benchmark that evaluates all requested method families in one framework. The refactor improves traceability, output organization, and experimental rigor by enforcing full Cartesian accounting and standardized schemas.

@@ -62,7 +62,34 @@ python -m pip install --disable-pip-version-check -r requirements.txt
 
 Or run the Colab notebook in `notebooks/colab/`.
 
-## 7) Where To Read Next
+## 7) Latest Full-Run Snapshot (M1)
+Executed on April 9, 2026 (Apple Silicon M1, CPU mode).
+
+Main command:
+```bash
+source .venv311/bin/activate
+CORES=$(sysctl -n hw.ncpu)
+export OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 NUMEXPR_NUM_THREADS=1 MPLBACKEND=Agg
+caffeinate -dimsu python src/cli/run_experiments.py --fresh --device cpu --checkpoint-every 120 --jobs "$CORES" --selection-jobs "$CORES"
+```
+
+Observed run metrics:
+- Runtime: `5294.26 sec` (`88.24 min`)
+- Expected fold evals: `4608`
+- Completed OK: `4392`
+- Skipped/failed: `216`
+
+Best pipelines:
+- Binary: `svm + quantile + pca + none` with `accuracy=0.976261`, `f1=0.939349`
+- Multiclass: `mlp_ann + minmax + pca + none` with `accuracy=0.685651`, `f1=0.685026`
+
+Validation and draft generation:
+```bash
+python src/cli/validate_cartesian_outputs.py
+python src/cli/generate_paper_drafts.py
+```
+
+## 8) Where To Read Next
 - Folder map: `FOLDER_STRUCTURE.md`
 - Colab workflow: `docs/guides/colab_workflow.md`
 - Lecture understanding: `docs/guides/lecture_understanding.md`

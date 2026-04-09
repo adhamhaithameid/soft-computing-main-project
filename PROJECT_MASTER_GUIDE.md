@@ -9,6 +9,10 @@ It benchmarks a full pipeline for **Epileptic Seizure Recognition** and produces
 - validation reports,
 - paper-ready draft content.
 
+## Scope Lock
+The project is intentionally constrained to **Epileptic Seizure Recognition only**.
+No multi-dataset switching is part of the production workflow.
+
 ## 2) Dataset Decision
 Selected dataset: **Epileptic Seizure Recognition**.
 
@@ -87,3 +91,6 @@ Global run index:
 3. Inspect top tables/figures.
 4. Update paper intro/discussion wording if needed.
 5. Export selected tables/figures into your final submission package.
+
+## 11) External Best-Practice Mapping
+- See `docs/guides/similar_projects_playbook.md` for a practical map of what strong public seizure-AI projects usually implement and what to adopt next here.

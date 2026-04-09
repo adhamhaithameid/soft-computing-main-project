@@ -7,6 +7,10 @@ End-to-end benchmark lab for **Epileptic Seizure Recognition** with:
 - reproducible outputs (metrics, tables, figures, reports),
 - paper drafting assets mapped to the course template.
 
+## Scope Lock
+This repository is dedicated to **one use case only**: Epileptic Seizure Recognition.
+All scripts, outputs, and documentation are optimized for this dataset and task.
+
 ## 1) What This Project Delivers
 - Preprocessing comparison: `standard`, `minmax`, `robust`, `quantile`
 - Feature reduction: `none`, `pca`, `lda_projection`, `svd`
@@ -121,3 +125,4 @@ Validation report:
 - `PROJECT_MASTER_GUIDE.md`
 - `FOLDER_STRUCTURE.md`
 - `ABOUT.md`
+- `docs/guides/similar_projects_playbook.md`

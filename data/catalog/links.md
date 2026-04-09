@@ -6,6 +6,6 @@
 - GitHub CSV mirror 1: https://raw.githubusercontent.com/akshayg056/Epileptic-seizure-detection-/master/data.csv
 - GitHub CSV mirror 2: https://raw.githubusercontent.com/dragonpilee/Epileptic-Seizure-Detection-System/master/data.csv
 
-## Alternative datasets compared in decision phase
-- UCI Parkinsons: https://archive.ics.uci.edu/dataset/174/parkinsons
-- UCI Mammographic Mass: https://archive.ics.uci.edu/dataset/161/mammographic+mass
+## Scope lock
+This repository is intentionally locked to the **Epileptic Seizure Recognition** use case.
+No alternative datasets are included in the active workflow.

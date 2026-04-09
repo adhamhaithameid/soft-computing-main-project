@@ -1,0 +1,36 @@
+{
+  "runs": [
+    {
+      "run_number": 1,
+      "run_id": "run1_20260409T130959Z",
+      "started_utc": "2026-04-09T13:09:59.453772+00:00",
+      "mode": "cpu",
+      "platform_profile": "mac",
+      "host_platform": "macOS-26.4-arm64-arm-64bit",
+      "runtime_sec": 48.482,
+      "runtime_hms": "00:00:48",
+      "validation": "PASS",
+      "execution_device": "cpu",
+      "acceleration_backend": "none",
+      "completed_ok": 4392,
+      "skipped_or_failed": 216,
+      "expected_fold_evals": 4608
+    },
+    {
+      "run_number": 2,
+      "run_id": "run2_20260409T131110Z",
+      "started_utc": "2026-04-09T13:11:10.396825+00:00",
+      "mode": "cpu",
+      "platform_profile": "mac",
+      "host_platform": "macOS-26.4-arm64-arm-64bit",
+      "runtime_sec": 48.795,
+      "runtime_hms": "00:00:48",
+      "validation": "PASS",
+      "execution_device": "cpu",
+      "acceleration_backend": "none",
+      "completed_ok": 4392,
+      "skipped_or_failed": 216,
+      "expected_fold_evals": 4608
+    }
+  ]
+}

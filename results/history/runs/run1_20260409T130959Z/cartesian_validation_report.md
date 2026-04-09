@@ -1,6 +1,6 @@
 # Cartesian Validation Report
 
-- Timestamp (UTC): 2026-04-09T13:11:58.761488+00:00
+- Timestamp (UTC): 2026-04-09T13:10:47.545840+00:00
 - Expected combos: 1536
 - Expected fold evals: 4608
 - Metrics rows: 4608
@@ -14,11 +14,11 @@
 - Execution device: cpu
 - Acceleration backend: none
 - Checkpoint percent: 5
-- Run label: run2_20260409T131110Z
+- Run label: run1_20260409T130959Z
 - Platform profile: mac
-- Started (UTC): 2026-04-09T13:11:14.222657+00:00
-- Finished (UTC): 2026-04-09T13:11:14.328287+00:00
-- Validation runtime (sec): 0.021
+- Started (UTC): 2026-04-09T13:10:03.540952+00:00
+- Finished (UTC): 2026-04-09T13:10:03.656915+00:00
+- Validation runtime (sec): 0.018
 
 Validation result: PASS
 

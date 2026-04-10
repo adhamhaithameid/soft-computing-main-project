@@ -8,7 +8,7 @@
 1. Open the URL above.
 2. Set runtime to Python 3.
 3. Run all cells in order.
-4. In the environment cell, set `RUN_ENV = "colab"` for Colab (or `"local"` for local Jupyter).
+4. `RUN_ENV` is auto-detected in the environment cell (`colab` online, `local` on laptop). Override only if needed.
 5. In the config cell, choose `RUN_PROFILE`:
    - `local_smoke` (quick)
    - `local_medium` (partial)

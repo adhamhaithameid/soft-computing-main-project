@@ -11,8 +11,10 @@ Run the staged Cartesian benchmark with a step-by-step notebook that supports bo
 - Classifiers: KNN, SVM, Decision Tree, Logistic Regression, LDA classifier, MLP/ANN
 
 ## Run Modes in Notebook
-- Set `RUN_ENV = "colab"` to run in Colab (auto install + optional zip export).
-- Set `RUN_ENV = "local"` to run on your laptop/workstation.
+- `RUN_ENV` is auto-detected:
+  - online Colab -> `colab`
+  - local Jupyter/VS Code -> `local`
+- You can still override manually if needed.
 - Use `RUN_PROFILE`:
   - `local_smoke` for fast checks
   - `local_medium` for practical partial runs

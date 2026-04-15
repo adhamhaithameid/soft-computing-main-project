@@ -14,6 +14,27 @@
    - `local_medium` (partial)
    - `full` (all 4608 fold evaluations)
 
+## Run Colab UI + local machine compute
+Use this when Colab cloud runtime is slow or disconnects during full Cartesian runs.
+
+1. In local terminal at repo root:
+   ```bash
+   ./start_colab_local_runtime.sh
+   ```
+2. Copy printed URL (`http://localhost:8888/?token=...`).
+3. In Colab top-right: `Connect` -> `Connect to local runtime`.
+4. Paste URL and connect.
+5. Run notebook cells from Colab page. Kernels execute locally.
+
+Stop local runtime:
+```bash
+./stop_colab_local_runtime.sh
+```
+
+If you get a 404 from old links:
+- old path: `soft-computing-main-project/03_notebooks/colab` (deleted)
+- current path: `epileptic-seizure-recognition/notebooks/colab`
+
 ## What the notebook executes
 - sets up environment (colab or local)
 - installs dependencies (in colab mode)

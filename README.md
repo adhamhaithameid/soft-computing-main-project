@@ -118,6 +118,29 @@ Validation report:
   - `RUN_ENV = "colab"` for Google Colab
   - `RUN_ENV = "local"` for local Jupyter execution
 
+### Run Colab UI with local compute (recommended for long runs)
+This lets you monitor in the Colab browser page while computation runs on your laptop.
+
+1. Start local runtime from this repo:
+```bash
+./start_colab_local_runtime.sh
+```
+
+2. Copy the printed URL (for example `http://localhost:8888/?token=...`).
+3. Open the notebook online:
+   - https://colab.research.google.com/github/adhamhaithameid/epileptic-seizure-recognition/blob/main/notebooks/colab/epileptic_seizure_full_pipeline_colab.ipynb
+4. In Colab: `Connect` -> `Connect to local runtime` -> paste the URL.
+
+Stop runtime when done:
+```bash
+./stop_colab_local_runtime.sh
+```
+
+Notes:
+- The old repo path `soft-computing-main-project/.../03_notebooks/colab` returns `404` because this project now uses:
+  `epileptic-seizure-recognition/notebooks/colab/...`
+- Local runtime logs are written to `.colab_runtime.log`.
+
 ## 9) Paper Assets
 - Template: `paper/template/`
 - Drafts: `paper/draft/`

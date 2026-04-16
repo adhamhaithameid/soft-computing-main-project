@@ -16,6 +16,8 @@ Why this mapping:
 """
 
 import pandas as pd
+import urllib.request
+import os
 import numpy as np
 import matplotlib
 
@@ -44,12 +46,29 @@ from scipy import stats
 
 sns.set_style("whitegrid")
 DATA_PATH = "epileptic_seizure_data.csv"
+DATA_URL_CANDIDATES = [
+    "https://raw.githubusercontent.com/adhamhaithameid/epileptic-seizure-recognition/experimental/new-stuff-migration/epileptic_seizure_data.csv",
+    "https://raw.githubusercontent.com/adhamhaithameid/epileptic-seizure-recognition/main/epileptic_seizure_data.csv",
+    "https://raw.githubusercontent.com/akshayg056/Epileptic-seizure-detection-/master/data.csv",
+]
 
-try:
-    df = pd.read_csv(DATA_PATH)
-except FileNotFoundError:
-    print(f"Error: '{DATA_PATH}' not found in project root.")
-    raise SystemExit(1)
+if not os.path.exists(DATA_PATH):
+    print(f"Local dataset not found: {DATA_PATH}. Attempting download...")
+    downloaded = False
+    for url in DATA_URL_CANDIDATES:
+        try:
+            urllib.request.urlretrieve(url, DATA_PATH)
+            print(f"Downloaded dataset from: {url}")
+            downloaded = True
+            break
+        except Exception as exc:
+            print(f"Failed URL: {url} -> {exc}")
+
+    if not downloaded:
+        print("Error: unable to find or download epileptic_seizure_data.csv")
+        raise SystemExit(1)
+
+df = pd.read_csv(DATA_PATH)
 
 # Drop unnamed index-like columns (e.g., '', 'Unnamed: 0').
 unnamed_cols = [c for c in df.columns if c == "" or str(c).startswith("Unnamed")]
